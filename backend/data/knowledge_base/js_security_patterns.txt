@@ -1,0 +1,21 @@
+1. innerHTML XSS: Setting user-controlled input directly to `element.innerHTML` without sanitization.
+2. eval() Injection: Passing user input to `eval()`, `setTimeout(string)`, or `new Function(string)`.
+3. Prototype Pollution: Unsafely merging objects (e.g., recursive copy) allowing `__proto__` injection.
+4. Insecure postMessage: Using `window.postMessage` with `*` target origin, or not checking `event.origin` on receipt.
+5. Missing CSP: Not defining a Content-Security-Policy, exposing the app to XSS risks.
+6. Sensitive Data in localStorage: Storing JWT tokens, passwords, or PII in `localStorage` or `sessionStorage`.
+7. Weak Randomness: Using `Math.random()` for generating security tokens, passwords, or session IDs.
+8. Regex DoS (ReDoS): Using vulnerable regular expressions that can cause catastrophic backtracking.
+9. document.write(): Using `document.write()` with user input, leading to XSS.
+10. Unvalidated Redirects: Using `window.location.href = userInput` without validating the URL.
+11. DOM Clobbering: Using global variables created automatically from element IDs.
+12. Insecure JSONP: Using JSONP with user-controlled callbacks.
+13. Cross-Site WebSocket Hijacking: Not validating the `Origin` header in WebSocket handshakes.
+14. React dangerouslySetInnerHTML: Using this prop without sanitizing the input first.
+15. Vue v-html: Binding user input to `v-html` without DOMPurify or similar sanitizers.
+16. Angular Bypass Security: Using `DomSanitizer.bypassSecurityTrustHtml` recklessly.
+17. Hardcoded Secrets: Leaving API keys or credentials in client-side code.
+18. Third-party Script inclusion: Including scripts from untrusted or unverified CDNs without subresource integrity (SRI).
+19. Unsafe target="_blank": Not adding `rel="noopener noreferrer"` to external links.
+20. Exposing Stack Traces: Returning full error stacks to the client in production APIs (Node.js).
+21. NPM Dependency Typosquatting: Using unverified packages that might execute malicious code on install.

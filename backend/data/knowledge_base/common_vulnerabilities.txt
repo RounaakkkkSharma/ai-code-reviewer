@@ -1,0 +1,21 @@
+1. SQL Injection: Concatenating strings to build database queries instead of using parameterized queries.
+2. Command Injection: Passing user input to system shells (e.g., `subprocess.Popen(..., shell=True)`).
+3. Hardcoded Credentials: Storing passwords, API keys, or private keys directly in source code.
+4. Insecure Deserialization: Reconstructing objects from untrusted input (e.g., Python `pickle`, Java `ObjectInputStream`).
+5. Path Traversal: Using user input to construct file paths without validation (e.g., `../../etc/passwd`).
+6. SSRF (Server-Side Request Forgery): Making HTTP requests to user-controlled URLs without restricting internal IPs.
+7. Timing Attacks: Using standard `==` or `!=` for comparing cryptographic hashes or passwords instead of constant-time comparison.
+8. Weak Cryptography: Using MD5 or SHA1 for hashing, or DES for encryption.
+9. Predictable Session IDs: Generating session identifiers using weak PRNGs.
+10. CSRF (Cross-Site Request Forgery): Missing anti-CSRF tokens on state-changing API endpoints.
+11. IDOR (Insecure Direct Object Reference): Accessing resources using IDs (e.g., `/user/123`) without checking authorization.
+12. Missing Rate Limiting: Not throttling authentication endpoints, enabling brute-force attacks.
+13. Verbose Error Messages: Exposing database versions, stack traces, or internal IP addresses in error responses.
+14. Unencrypted Transport: Sending sensitive data over HTTP or allowing unauthenticated connections.
+15. XML External Entity (XXE): Parsing XML without disabling DTDs or external entities.
+16. Lack of Input Validation: Trusting data from headers, cookies, or bodies without sanitization.
+17. Open Redirects: Redirecting users to arbitrary URLs based on input parameters.
+18. Insecure Default Configuration: Leaving debug modes enabled or using default admin passwords in production.
+19. Race Conditions (TOCTOU): Checking a condition and acting on it asynchronously without locking.
+20. Missing Auth Checks: Assuming an endpoint is hidden and not adding authentication middleware.
+21. Buffer Overflow: In lower-level languages, failing to check buffer bounds when copying strings or data.

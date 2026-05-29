@@ -1,0 +1,21 @@
+1. Mutable Default Arguments: Defining functions with mutable default arguments like `def foo(x=[])`.
+2. Value Comparison with `is`: Using `is` instead of `==` to compare values (e.g., `a is 5`).
+3. Broad Exception Catching: Catching `Exception` or using bare `except:` instead of specific exceptions.
+4. Missing Context Managers: Not using `with` statement for file operations or network connections.
+5. Type Checking: Using `type(x) == type(y)` instead of `isinstance(x, cls)`.
+6. Shadowing Builtins: Naming variables `id`, `list`, `dict`, `str`, `int`, etc.
+7. Unnecessary Loops: Not using list/dict/set comprehensions where appropriate.
+8. Global Variables: Relying on or modifying global state using the `global` keyword unnecessarily.
+9. Assert for Validation: Using `assert` statements to enforce runtime validation (it's stripped in optimized mode).
+10. String Concatenation: Using `+` inside a loop for string concatenation instead of `''.join()`.
+11. Iterating with Index: Using `for i in range(len(lst)):` instead of `for item in lst:` or `enumerate()`.
+12. Unused Imports/Variables: Keeping imports or local variables that are never used.
+13. Default Dict Fallback: Using `if key in d: v = d[key] else: v = default` instead of `d.get(key, default)`.
+14. Mutable Class Attributes: Initializing class-level mutable variables instead of instance-level in `__init__`.
+15. Inefficient Checking: Using `if lst == []:` or `if len(lst) == 0:` instead of `if not lst:`.
+16. Unpacking Limitations: Not using tuple unpacking to swap variables (e.g., `temp = a; a = b; b = temp`).
+17. Manual Resource Cleanup: Relying on `__del__` for resource cleanup instead of context managers.
+18. Deep Nesting: Having excessive nested `if/else` blocks instead of early returns.
+19. Return None Explicitly: Ending functions with `return None` unnecessarily.
+20. In-place List Modifications: Modifying a list while iterating over it without creating a copy.
+21. Lambda Rebinding: Using closures in loops that bind to the variable rather than the value (e.g., `lambda: x`).

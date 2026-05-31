@@ -2,32 +2,180 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Google Font fallback ─── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Brand palette */
+  --brand-50:  #eef2ff;
+  --brand-100: #e0e7ff;
+  --brand-500: #6366f1;
+  --brand-600: #4f46e5;
+  --brand-700: #4338ca;
+
+  /* Severity colours */
+  --sev-critical: #ef4444;
+  --sev-high:     #f97316;
+  --sev-medium:   #f59e0b;
+  --sev-low:      #3b82f6;
+  --sev-info:     #94a3b8;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
+/* ─── Base reset ─── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  font-family: var(--font-inter);
+  background: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* ─── Custom scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ─── Keyframe animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  70%  { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+@keyframes dash {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ─── Animation utility classes ─── */
+.animate-fade-in     { animation: fadeIn  0.4s ease forwards; }
+.animate-slide-up    { animation: slideUp 0.5s ease forwards; }
+.animate-slide-down  { animation: slideDown 0.3s ease forwards; }
+.animate-scale-in    { animation: scaleIn 0.3s ease forwards; }
+.animate-shimmer     {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.animate-spin-slow   { animation: spin 1s linear infinite; }
+.animate-pulse-ring  { animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite; }
+
+/* Staggered delays */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+
+/* ─── Glassmorphism ─── */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ─── Gradient text ─── */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Hero gradient background ─── */
+.hero-bg {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99,102,241,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 80% 50%, rgba(139,92,246,0.08) 0%, transparent 50%),
+    #f8fafc;
+}
+
+/* ─── Grid dot pattern ─── */
+.grid-pattern {
+  background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ─── Card hover lift ─── */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -8px rgba(99,102,241,0.15);
+}
+
+/* ─── Severity left-border accent ─── */
+.border-severity-critical { border-left: 4px solid var(--sev-critical); }
+.border-severity-high     { border-left: 4px solid var(--sev-high); }
+.border-severity-medium   { border-left: 4px solid var(--sev-medium); }
+.border-severity-low      { border-left: 4px solid var(--sev-low); }
+.border-severity-info     { border-left: 4px solid var(--sev-info); }
+
+/* ─── Agent card status glow ─── */
+.agent-analyzing {
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.3), 0 0 16px rgba(99,102,241,0.15);
+  border-color: rgba(99,102,241,0.4) !important;
+}
+.agent-complete {
+  box-shadow: 0 0 0 1px rgba(34,197,94,0.3);
+  border-color: rgba(34,197,94,0.3) !important;
+}
+
+/* ─── Progress bar animated fill ─── */
+.progress-bar-fill {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── CodeMirror tweaks ─── */
+.cm-editor { border-radius: 0; }
+.cm-scroller { font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace !important; font-size: 13px; }
+
+/* ─── Tailwind animate-in compat ─── */
+.animate-in { animation-fill-mode: both; }
+.fade-in    { animation-name: fadeIn; animation-duration: 0.4s; }
+.zoom-in    { animation-name: scaleIn; animation-duration: 0.3s; }
+.slide-in-from-bottom-4 { animation-name: slideUp; animation-duration: 0.5s; }

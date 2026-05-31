@@ -51,20 +51,42 @@ export function useReview() {
     }
   }, []);
 
-  const submitSnippet = async (code: string, language: string, context: string) => {
+  const submitSnippet = async (
+    code: string,
+    language: string,
+    context: string,
+    reviewMode: 'fast' | 'deep' = 'deep',
+    categories: string[] = ['bug', 'security', 'performance', 'style']
+  ) => {
     resetState();
     await startStream(
       `${BASE_URL}/api/v1/review/snippet`,
-      { code, language, context },
+      {
+        code,
+        language,
+        context,
+        review_mode: reviewMode,
+        categories,
+      },
       handleStreamEvent
     );
   };
 
-  const submitPR = async (prUrl: string, context: string) => {
+  const submitPR = async (
+    prUrl: string,
+    context: string,
+    reviewMode: 'fast' | 'deep' = 'deep',
+    categories: string[] = ['bug', 'security', 'performance', 'style']
+  ) => {
     resetState();
     await startStream(
       `${BASE_URL}/api/v1/review/github-pr`,
-      { github_pr_url: prUrl, context },
+      {
+        github_pr_url: prUrl,
+        context,
+        review_mode: reviewMode,
+        categories,
+      },
       handleStreamEvent
     );
   };

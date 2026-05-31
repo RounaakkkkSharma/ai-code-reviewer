@@ -62,7 +62,7 @@ cp .env.example .env
 # Open .env and add your GEMINI_API_KEY
 
 # Start Server
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --reload-dir app
 ```
 
 ### 2. Frontend Setup

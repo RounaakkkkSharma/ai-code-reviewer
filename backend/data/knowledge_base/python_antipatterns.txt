@@ -1,21 +1,28 @@
-1. Mutable Default Arguments: Defining functions with mutable default arguments like `def foo(x=[])`.
-2. Value Comparison with `is`: Using `is` instead of `==` to compare values (e.g., `a is 5`).
-3. Broad Exception Catching: Catching `Exception` or using bare `except:` instead of specific exceptions.
-4. Missing Context Managers: Not using `with` statement for file operations or network connections.
-5. Type Checking: Using `type(x) == type(y)` instead of `isinstance(x, cls)`.
-6. Shadowing Builtins: Naming variables `id`, `list`, `dict`, `str`, `int`, etc.
-7. Unnecessary Loops: Not using list/dict/set comprehensions where appropriate.
-8. Global Variables: Relying on or modifying global state using the `global` keyword unnecessarily.
-9. Assert for Validation: Using `assert` statements to enforce runtime validation (it's stripped in optimized mode).
-10. String Concatenation: Using `+` inside a loop for string concatenation instead of `''.join()`.
-11. Iterating with Index: Using `for i in range(len(lst)):` instead of `for item in lst:` or `enumerate()`.
-12. Unused Imports/Variables: Keeping imports or local variables that are never used.
-13. Default Dict Fallback: Using `if key in d: v = d[key] else: v = default` instead of `d.get(key, default)`.
-14. Mutable Class Attributes: Initializing class-level mutable variables instead of instance-level in `__init__`.
-15. Inefficient Checking: Using `if lst == []:` or `if len(lst) == 0:` instead of `if not lst:`.
-16. Unpacking Limitations: Not using tuple unpacking to swap variables (e.g., `temp = a; a = b; b = temp`).
-17. Manual Resource Cleanup: Relying on `__del__` for resource cleanup instead of context managers.
-18. Deep Nesting: Having excessive nested `if/else` blocks instead of early returns.
-19. Return None Explicitly: Ending functions with `return None` unnecessarily.
-20. In-place List Modifications: Modifying a list while iterating over it without creating a copy.
-21. Lambda Rebinding: Using closures in loops that bind to the variable rather than the value (e.g., `lambda: x`).
+# Python Anti-Patterns Knowledge Base
+# Each line is a standalone pattern used for semantic search in ChromaDB RAG.
+
+Using mutable default arguments in function definitions causes shared state between calls, e.g. def foo(items=[]) appends to the same list every call. Use None as default and initialize inside the function body.
+Using 'is' operator to compare values like strings or integers instead of '==' checks object identity not equality. 'is' should only be used for None checks or singleton comparisons.
+Catching bare 'except:' or 'except Exception:' without specificity swallows all errors silently. Always catch specific exception types like ValueError, IOError, or KeyError.
+Not using context managers (with statement) for file operations risks resource leaks. Files may not be closed if an exception occurs before the explicit close() call.
+Using type() for type checking instead of isinstance() breaks polymorphism and doesn't support subclasses. Use isinstance(obj, ExpectedType) instead.
+Shadowing Python builtins like list, dict, id, type, input, or str as variable names breaks built-in functionality and causes confusing bugs.
+Using assert statements for runtime validation in production code is dangerous because assertions are disabled when Python runs with the -O flag. Use explicit if checks and raise ValueError instead.
+Global variables create hidden coupling between functions and make code hard to test. Prefer passing values as parameters or using class attributes.
+Using string concatenation in loops with += builds O(n^2) strings. Use str.join() or io.StringIO for building strings in loops.
+Not using list comprehensions where appropriate results in verbose and slower code. [x*2 for x in items] is faster and cleaner than an equivalent for loop with append.
+Returning None implicitly from a function that sometimes returns a value forces callers to always check for None. Raise an exception or always return a consistent type.
+Using range(len(items)) to iterate with index instead of enumerate(items) is verbose and error-prone. Use for i, item in enumerate(items) for indexed iteration.
+Not closing database connections or network sockets leads to resource exhaustion. Use context managers or try/finally blocks to guarantee cleanup.
+Using wildcard imports (from module import *) pollutes the namespace and makes it impossible to tell where names come from. Always import explicitly.
+Storing passwords or secrets in plaintext in source code or config files is a critical security violation. Use environment variables or secret managers.
+Using time.sleep() in async functions blocks the entire event loop. Use await asyncio.sleep() instead.
+Creating a new database connection on every request instead of using a connection pool causes severe performance degradation under load.
+Not validating user input before processing leads to crashes and security vulnerabilities. Always validate type, range, and format of all external inputs.
+Using print() for logging in production code loses severity levels, timestamps, and routing. Use Python's logging module with appropriate log levels.
+Mixing synchronous blocking code with async code causes event loop blocking. Any blocking I/O must be wrapped with asyncio.run_in_executor().
+Using datetime.now() without timezone information (naive datetimes) causes bugs when dealing with multiple timezones. Use datetime.now(tz=timezone.utc) or datetime.utcnow().
+Catching an exception and then re-raising a new exception without chaining (raise NewError() instead of raise NewError() from original) loses the original traceback. Always use 'raise NewError() from original_exception'.
+Using a list where a set is appropriate for membership testing (if x in my_list) results in O(n) lookups instead of O(1). Convert to a set for repeated membership checks.
+Not using dataclasses or Pydantic for structured data when a plain dict is used everywhere. Untyped dicts hide the data structure and make refactoring difficult.
+Using os.system() or subprocess with shell=True instead of subprocess.run() with a list of args is a security risk and harder to handle errors correctly.

@@ -1,50 +1,74 @@
+"""Style Checker Agent node.
+
+Analyses code for naming convention violations, overly long functions, deep
+nesting, magic numbers, missing docstrings, DRY violations, dead code, and
+inconsistent formatting.
+"""
+
 import json
-from langchain_google_genai import ChatGoogleGenerativeAI
+import logging
+
+from langchain_ollama import ChatOllama
 from langchain_core.prompts import PromptTemplate
+
 from app.agents.state import ReviewState
 from app.prompts.style_prompt import STYLE_PROMPT_TEMPLATE
-from app.config import settings
+from app.config import settings, ollama_lock
 from app.models.review_response import Category
 
-async def style_checker_node(state: ReviewState):
-    code = state.get("original_code", "")
-    language = state.get("language", "python")
-    context = state.get("context", "")
-    
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
-        google_api_key=settings.GEMINI_API_KEY,
-        temperature=0.1
+logger = logging.getLogger(__name__)
+
+
+async def style_checker_node(state: ReviewState) -> dict:
+    """Detect code style and readability issues in the submitted code.
+
+    Args:
+        state: Current LangGraph state containing ``original_code``,
+               ``language``, and ``context``.
+
+    Returns:
+        A partial state dict with ``style_findings`` (list of raw finding dicts).
+        Returns an empty list on failure so the pipeline can continue.
+    """
+    code: str = state.get("original_code", "")
+    language: str = state.get("language", "python")
+    context: str = state.get("context", "")
+
+    llm = ChatOllama(
+        base_url=settings.OLLAMA_BASE_URL,
+        model=settings.OLLAMA_MODEL,
+        temperature=0.1,
+        format="json",
     )
-    
+
     prompt = PromptTemplate.from_template(STYLE_PROMPT_TEMPLATE)
     chain = prompt | llm
-    
+
     try:
-        response = await chain.ainvoke({
-            "language": language,
-            "context": context,
-            "code": code
-        })
-        
-        text = response.content.strip()
-        if text.startswith("```json"): text = text[7:]
-        if text.startswith("```"): text = text[3:]
-        if text.endswith("```"): text = text[:-3]
-            
-        result = json.loads(text)
-        findings = result.get("findings", [])
-        
-        for f in findings:
-            f["category"] = Category.style.value
-            
-        return {
-            "style_findings": findings,
-            "positive_aspects": result.get("positive_aspects", [])
-        }
-    except Exception as e:
-        print(f"Style checker failed: {e}")
-        return {
-            "style_findings": [],
-            "positive_aspects": []
-        }
+        async with ollama_lock:
+            response = await chain.ainvoke({
+                "language": language,
+                "context": context or "No additional context provided.",
+                "code": code,
+            })
+
+        text: str = response.content.strip()
+        if text.startswith("```json"):
+            text = text[7:]
+        if text.startswith("```"):
+            text = text[3:]
+        if text.endswith("```"):
+            text = text[:-3]
+
+        result: dict = json.loads(text.strip())
+        findings: list[dict] = result.get("findings", [])
+
+        for finding in findings:
+            finding["category"] = Category.style.value
+
+        logger.info("Style checker found %d issues.", len(findings))
+        return {"style_findings": findings}
+
+    except Exception:
+        logger.exception("Style checker failed — returning empty findings.")
+        return {"style_findings": []}

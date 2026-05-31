@@ -1,21 +1,28 @@
-1. innerHTML XSS: Setting user-controlled input directly to `element.innerHTML` without sanitization.
-2. eval() Injection: Passing user input to `eval()`, `setTimeout(string)`, or `new Function(string)`.
-3. Prototype Pollution: Unsafely merging objects (e.g., recursive copy) allowing `__proto__` injection.
-4. Insecure postMessage: Using `window.postMessage` with `*` target origin, or not checking `event.origin` on receipt.
-5. Missing CSP: Not defining a Content-Security-Policy, exposing the app to XSS risks.
-6. Sensitive Data in localStorage: Storing JWT tokens, passwords, or PII in `localStorage` or `sessionStorage`.
-7. Weak Randomness: Using `Math.random()` for generating security tokens, passwords, or session IDs.
-8. Regex DoS (ReDoS): Using vulnerable regular expressions that can cause catastrophic backtracking.
-9. document.write(): Using `document.write()` with user input, leading to XSS.
-10. Unvalidated Redirects: Using `window.location.href = userInput` without validating the URL.
-11. DOM Clobbering: Using global variables created automatically from element IDs.
-12. Insecure JSONP: Using JSONP with user-controlled callbacks.
-13. Cross-Site WebSocket Hijacking: Not validating the `Origin` header in WebSocket handshakes.
-14. React dangerouslySetInnerHTML: Using this prop without sanitizing the input first.
-15. Vue v-html: Binding user input to `v-html` without DOMPurify or similar sanitizers.
-16. Angular Bypass Security: Using `DomSanitizer.bypassSecurityTrustHtml` recklessly.
-17. Hardcoded Secrets: Leaving API keys or credentials in client-side code.
-18. Third-party Script inclusion: Including scripts from untrusted or unverified CDNs without subresource integrity (SRI).
-19. Unsafe target="_blank": Not adding `rel="noopener noreferrer"` to external links.
-20. Exposing Stack Traces: Returning full error stacks to the client in production APIs (Node.js).
-21. NPM Dependency Typosquatting: Using unverified packages that might execute malicious code on install.
+# JavaScript and TypeScript Security Patterns Knowledge Base
+# Each line is a standalone pattern used for semantic search in ChromaDB RAG.
+
+Setting innerHTML with user-controlled data enables XSS (Cross-Site Scripting) attacks. Use textContent or sanitize with DOMPurify before assigning innerHTML.
+Using eval() to execute user-supplied strings allows arbitrary code execution. Never pass user input to eval(), Function(), or setTimeout with a string argument.
+Prototype pollution occurs when user-controlled keys like __proto__, constructor, or prototype are merged into objects without validation, corrupting all objects of that class.
+Using Math.random() to generate security tokens, CSRF tokens, or session IDs is cryptographically weak. Use crypto.getRandomValues() or crypto.randomUUID() instead.
+Storing sensitive data like auth tokens, PII, or passwords in localStorage or sessionStorage exposes them to XSS attacks. Use HttpOnly cookies for sensitive tokens.
+Missing origin validation in postMessage handlers allows any website to send messages and trigger actions. Always verify event.origin against a whitelist before processing postMessage data.
+Regular expressions vulnerable to ReDoS (catastrophic backtracking) like /(a+)+$/ can be exploited to hang the server with crafted input. Use linear-time regex or add input length limits.
+Using document.write() with user data is an XSS vector and deprecated. Use DOM manipulation methods instead.
+Missing Content-Security-Policy headers allows inline scripts and arbitrary external scripts to execute. Always set a strict CSP header.
+SQL injection via string concatenation in query strings: `SELECT * FROM users WHERE id = ${userId}` allows injection. Always use parameterized queries or an ORM.
+Sending credentials with fetch() to cross-origin endpoints without CORS validation can leak tokens. Audit all fetch() calls that include credentials: 'include'.
+Using dangerouslySetInnerHTML in React without sanitizing the content introduces XSS. Only use with server-controlled trusted HTML, never with user input.
+Not validating file upload MIME types and extensions server-side allows uploading executable files. Always validate on the server regardless of client-side checks.
+Using HTTP instead of HTTPS for API calls in production transmits data in plaintext. Always enforce HTTPS and use HSTS headers.
+Hardcoded API keys, tokens, or passwords in JavaScript source code are exposed to anyone who views the source. Use environment variables and never commit secrets to source control.
+Missing rate limiting on authentication endpoints allows brute-force attacks against passwords and tokens. Implement rate limiting with exponential backoff.
+Returning detailed error messages (stack traces, SQL errors, file paths) to clients leaks implementation details useful for attackers. Use generic error messages in production.
+Using JSON.parse() on user input without try/catch crashes the process on malformed JSON. Always wrap JSON.parse in try/catch.
+CSRF vulnerabilities occur when state-changing requests don't require a CSRF token. Use SameSite=Strict cookies or validate a CSRF token header on all non-GET requests.
+Insecure direct object references (IDOR): accessing resources like /api/user/123/data without verifying the authenticated user owns resource 123. Always authorize at the resource level.
+Using npm packages without checking for known vulnerabilities allows supply chain attacks. Run npm audit regularly and keep dependencies updated.
+Disabling certificate validation (rejectUnauthorized: false in Node https) allows man-in-the-middle attacks. Never disable TLS validation in production.
+Using console.log() to log sensitive data like passwords, tokens, or PII creates security audit failures and leaks data to log aggregators. Sanitize all log output.
+Storing JWT tokens in localStorage instead of HttpOnly cookies exposes them to XSS theft. Use HttpOnly, Secure, SameSite=Strict cookies for session tokens.
+Allowing user-controlled redirects (redirect to: req.query.url) without validating the target URL allows open redirect attacks that can be used in phishing.

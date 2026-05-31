@@ -1,21 +1,28 @@
-1. SQL Injection: Concatenating strings to build database queries instead of using parameterized queries.
-2. Command Injection: Passing user input to system shells (e.g., `subprocess.Popen(..., shell=True)`).
-3. Hardcoded Credentials: Storing passwords, API keys, or private keys directly in source code.
-4. Insecure Deserialization: Reconstructing objects from untrusted input (e.g., Python `pickle`, Java `ObjectInputStream`).
-5. Path Traversal: Using user input to construct file paths without validation (e.g., `../../etc/passwd`).
-6. SSRF (Server-Side Request Forgery): Making HTTP requests to user-controlled URLs without restricting internal IPs.
-7. Timing Attacks: Using standard `==` or `!=` for comparing cryptographic hashes or passwords instead of constant-time comparison.
-8. Weak Cryptography: Using MD5 or SHA1 for hashing, or DES for encryption.
-9. Predictable Session IDs: Generating session identifiers using weak PRNGs.
-10. CSRF (Cross-Site Request Forgery): Missing anti-CSRF tokens on state-changing API endpoints.
-11. IDOR (Insecure Direct Object Reference): Accessing resources using IDs (e.g., `/user/123`) without checking authorization.
-12. Missing Rate Limiting: Not throttling authentication endpoints, enabling brute-force attacks.
-13. Verbose Error Messages: Exposing database versions, stack traces, or internal IP addresses in error responses.
-14. Unencrypted Transport: Sending sensitive data over HTTP or allowing unauthenticated connections.
-15. XML External Entity (XXE): Parsing XML without disabling DTDs or external entities.
-16. Lack of Input Validation: Trusting data from headers, cookies, or bodies without sanitization.
-17. Open Redirects: Redirecting users to arbitrary URLs based on input parameters.
-18. Insecure Default Configuration: Leaving debug modes enabled or using default admin passwords in production.
-19. Race Conditions (TOCTOU): Checking a condition and acting on it asynchronously without locking.
-20. Missing Auth Checks: Assuming an endpoint is hidden and not adding authentication middleware.
-21. Buffer Overflow: In lower-level languages, failing to check buffer bounds when copying strings or data.
+# Common Vulnerability Patterns Knowledge Base (Language-Agnostic)
+# Each line is a standalone pattern used for semantic search in ChromaDB RAG.
+
+SQL injection via string concatenation: building SQL queries by concatenating user input like "SELECT * FROM users WHERE name = '" + name + "'" allows attackers to inject arbitrary SQL. Always use parameterized queries or prepared statements.
+Command injection via subprocess with shell=True and user-controlled input: subprocess.run(f"ping {host}", shell=True) allows attackers to inject shell commands. Use subprocess.run(["ping", host]) with a list.
+Hardcoded credentials in source code: passwords, API keys, database connection strings, or private keys committed to source control are permanently exposed. Use environment variables or a secrets manager.
+Path traversal vulnerability: using user-controlled file paths like open(base_dir + user_input) allows attackers to read arbitrary files. Always sanitize paths with os.path.abspath() and validate they start within the allowed base directory.
+Server-Side Request Forgery (SSRF): making HTTP requests to a URL supplied by the user (requests.get(user_url)) allows attackers to probe internal services. Validate and allowlist URLs before making requests.
+Insecure deserialization: using pickle.loads(), yaml.load() without Loader, or Java ObjectInputStream with untrusted data allows arbitrary code execution. Use safe alternatives like json.loads() or yaml.safe_load().
+Timing attack in string comparison: comparing secrets with == (constant-time) works but comparing with a loop that returns early leaks timing information. Use hmac.compare_digest() for secret comparison.
+Missing authentication: endpoints that modify state or return sensitive data without verifying the caller's identity. Always authenticate before authorizing.
+Broken access control: authenticated users accessing other users' data by changing an ID in the URL or request body. Always verify the authenticated user owns the resource they're accessing.
+Insecure cryptography: using MD5 or SHA-1 for password hashing is cryptographically broken. Use bcrypt, argon2, or PBKDF2 with a salt for password hashing.
+Weak random number generation for security purposes: using language built-in random functions (Math.random, random.random) for tokens or session IDs. Use cryptographically secure random generators.
+Logging sensitive data: writing passwords, credit card numbers, SSNs, tokens, or PII to log files. Sanitize all sensitive fields before logging.
+XML External Entity (XXE) injection: parsing XML with external entity processing enabled allows reading local files or SSRF. Disable external entities in XML parsers.
+Missing input length validation: accepting arbitrarily long input strings can cause denial of service through memory exhaustion or extremely slow processing. Always validate and limit input length.
+Unvalidated redirects: redirecting users to a URL parameter value without validation enables open redirect attacks used in phishing. Validate redirect targets against an allowlist.
+Exposure of sensitive data in error messages: returning stack traces, SQL errors, or file paths in API error responses reveals implementation details. Return generic error messages in production.
+Cross-Site Request Forgery (CSRF): state-changing API endpoints that accept requests from any origin without a CSRF token. Implement CSRF protection for all non-idempotent endpoints.
+Dependency confusion attack: using internal package names that also exist on public registries can cause supply chain compromise. Use private registry scoping.
+Mass assignment vulnerability: blindly applying all user-supplied JSON fields to a model update allows users to modify fields they shouldn't, like isAdmin or role. Explicitly allowlist updatable fields.
+Sensitive data in URLs: placing tokens, passwords, or session IDs in URL query parameters causes them to appear in server logs, browser history, and Referer headers. Use request headers or POST body instead.
+Insufficient session expiry: sessions that never expire or have very long lifetimes increase the window for session hijacking. Implement appropriate session timeouts and token rotation.
+Cleartext transmission of sensitive data: sending passwords, tokens, or PII over HTTP instead of HTTPS allows interception. Always enforce TLS and use HSTS headers.
+Insufficient entropy in token generation: generating short (under 128-bit) or low-entropy tokens for password reset, email verification, or API keys makes them guessable. Use at least 256 bits of cryptographic randomness.
+Denial of service via regex: user-controlled input matched against a vulnerable regex pattern with catastrophic backtracking can consume 100% CPU. Audit all regexes that process user input.
+File upload without type validation: accepting file uploads without validating the content type server-side (not just the extension) allows uploading malicious scripts. Validate MIME type by reading file magic bytes.

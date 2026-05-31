@@ -25,7 +25,7 @@ async def fetch_pr_diff(pr_url: str) -> tuple[str, str]:
     api_url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pull_number}"
     
     headers = {"Accept": "application/vnd.github.v3.diff"}
-    if settings.GITHUB_TOKEN:
+    if settings.GITHUB_TOKEN and settings.GITHUB_TOKEN != "your_optional_github_pat_here":
         headers["Authorization"] = f"Bearer {settings.GITHUB_TOKEN}"
         
     async with httpx.AsyncClient() as client:
